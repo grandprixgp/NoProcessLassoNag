@@ -1,4 +1,6 @@
-import sys, mmap
+import os, sys, mmap
+
+target = 'ProcessLasso.exe'
 
 patches = (
     {'offset': 0x56C31, 'original': b'\x75', 'patch': b'\x74'},
@@ -6,7 +8,10 @@ patches = (
 )
 
 def main():
-    with open(sys.argv[1] if len(sys.argv) > 1 else 'ProcessLasso.exe', 'r+b') as f:
+    inline = True if (len(sys.argv) > 1 and sys.argv[1] == "inline") else False
+    if inline:
+        os.rename(target, target[:target.find('.')] + '_original' + target[target.find('.'):])
+    with open('ProcessLasso_original.exe' if inline else 'ProcessLasso.exe', 'r+b' ) as f:
         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_COPY)
         for patch in patches:
             mm.seek(patch['offset'])
@@ -18,9 +23,14 @@ def main():
             else:
                 print("Unable to locate patch at {0}".format(hex(patch['offset'])))
         if input("Write patch to disk? y/n ") == "y":
-            with open('ProcessLasso_patched.exe', 'w+b') as p:
+            with open('ProcessLasso.exe' if inline else 'ProcessLasso_patched.exe', 'w+b') as p:
                 for byte in mm:
                     p.write(byte)
+        else:
+            if inline:
+                f.close()
+                mm.close()
+                os.rename(target[:target.find('.')] + '_original' + target[target.find('.'):], target)
 
 if __name__ == '__main__':
     main()
