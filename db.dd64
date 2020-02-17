@@ -1,0 +1,61 @@
+{
+ "bookmarks": [
+  {
+   "module": "processlasso.exe",
+   "address": "0x57831",
+   "manual": true
+  }
+ ],
+ "breakpoints": [
+  {
+   "address": "0x57831",
+   "enabled": true,
+   "oldbytes": "0x2E75",
+   "type": 0,
+   "titantype": "0x0",
+   "name": "",
+   "module": "processlasso.exe",
+   "breakCondition": "",
+   "logText": "",
+   "logCondition": "",
+   "commandText": "",
+   "commandCondition": "",
+   "fastResume": false,
+   "silent": false
+  },
+  {
+   "address": "0x5785C",
+   "enabled": true,
+   "oldbytes": "0x5FE8",
+   "type": 0,
+   "titantype": "0x0",
+   "name": "",
+   "module": "processlasso.exe",
+   "breakCondition": "",
+   "logText": "",
+   "logCondition": "",
+   "commandText": "",
+   "commandCondition": "",
+   "fastResume": false,
+   "silent": false
+  },
+  {
+   "address": "0xB2E89",
+   "enabled": true,
+   "oldbytes": "0xB2E8",
+   "type": 0,
+   "titantype": "0x0",
+   "name": "",
+   "module": "processlasso.exe",
+   "breakCondition": "",
+   "logText": "",
+   "logCondition": "",
+   "commandText": "",
+   "commandCondition": "",
+   "fastResume": false,
+   "silent": false
+  }
+ ],
+ "hashAlgorithm": "murmurhash",
+ "hash": "0x8A68D0A692801DD"
+}
