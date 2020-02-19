@@ -1,11 +1,20 @@
-import os, sys, mmap
+import os, sys, mmap, re
 
 target = 'ProcessLasso.exe'
 
 patches = (
-    {'offset': 0x56C31, 'original': b'\x75', 'patch': b'\x74'},
-    {'offset': 0x56C35, 'original': b'\x75', 'patch': b'\x74'},
+    {'name': 'first jnz instruction', 'original': b'\x75', 'patch': b'\x74', 'signature': b'\xE8....\x41\x3A\xC5\x75\x2E\x84\xDB\x75\x2A', 'offset': 8},
+    {'name': 'second jnz instruction', 'original': b'\x75', 'patch': b'\x74', 'signature': b'\xE8....\x41\x3A\xC5\x74\x2E\x84\xDB\x75\x2A', 'offset': 12},
 )
+
+def scan(file, patch):
+    result = re.search(patch['signature'], file.read())
+    if result is not None:
+        position = result.start() + patch['offset']
+        file.seek(position)
+        if (file.read(len(patch['original'])) == patch['original']):
+            return result.start() + patch['offset']
+    return None
 
 def main():
     inline = True if (len(sys.argv) > 1 and sys.argv[1] == "inline") else False
@@ -14,16 +23,18 @@ def main():
     with open('ProcessLasso_original.exe' if inline else 'ProcessLasso.exe', 'r+b' ) as f:
         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_COPY)
         for patch in patches:
-            mm.seek(patch['offset'])
-            data = mm.read(len(patch['original']))
-            if data == patch['original']:
-                print("Patched 0x{0} at {1} to 0x{2}".format(data.hex(), hex(patch['offset']), patch['patch'].hex()))
-                mm.seek(patch['offset'])
+            print(f"Searching for: {patch['name']}")
+            mm.seek(0)
+            patch_location = scan(mm, patch)
+            if patch_location:
+                mm.seek(patch_location)
                 mm.write(patch['patch'])
+                print(f"{hex(patch_location)}: 0x{patch['original'].hex()} -> 0x{patch['patch'].hex()}")
             else:
-                print("Unable to locate patch at {0}".format(hex(patch['offset'])))
+                print(f"Unable to find: {patch['name']}")
         if input("Write patch to disk? y/n ") == "y":
             with open('ProcessLasso.exe' if inline else 'ProcessLasso_patched.exe', 'w+b') as p:
+                mm.seek(0)
                 for byte in mm:
                     p.write(byte)
         else:
