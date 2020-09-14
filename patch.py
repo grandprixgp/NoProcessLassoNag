@@ -3,18 +3,19 @@ import os, sys, mmap, re
 target = 'ProcessLasso.exe'
 
 patches = (
-    {'name': 'first jnz instruction', 'original': b'\x75', 'patch': b'\x74', 'signature': b'\xE8....\x41\x3A\xC5\x75\x2E\x84\xDB\x75\x2A', 'offset': 8},
-    {'name': 'second jnz instruction', 'original': b'\x75', 'patch': b'\x74', 'signature': b'\xE8....\x41\x3A\xC5\x74\x2E\x84\xDB\x75\x2A', 'offset': 12},
+	{'name': 'jne patch', 'original': b'\x75', 'patch': b'\x74', 'signature': b'\xE8\x20\xBE\xFF\xFF\x3C\x01\x75', 'offset': 7},
 )
 
 def scan(file, patch):
-    result = re.search(patch['signature'], file.read())
-    if result is not None:
-        position = result.start() + patch['offset']
-        file.seek(position)
-        if (file.read(len(patch['original'])) == patch['original']):
-            return result.start() + patch['offset']
-    return None
+	results = re.finditer(patch['signature'], file.read())
+	if results is not None:		
+		for result in results:
+			print(result)
+			position = result.start() + patch['offset']
+			file.seek(position)
+			if (file.read(len(patch['original'])) == patch['original']):
+				return result.start() + patch['offset']
+	return None
 
 def main():
     inline = True if (len(sys.argv) > 1 and sys.argv[1] == "inline") else False
