@@ -3,7 +3,7 @@ import os, sys, mmap, re
 target = 'ProcessLasso.exe'
 
 patches = (
-	{'name': 'jne patch', 'original': b'\x75', 'patch': b'\x74', 'signature': b'\xE8\x20\xBE\xFF\xFF\x3C\x01\x75', 'offset': 7},
+	{'name': 'cmp patch', 'original': b'\x01', 'patch': b'\x00', 'signature': b'\x0F\xB6\xDB\x66\x85\xC0\xB8\x01\x00\x00\x00\x0F\x44\xD8\xE8(.|\s)(.|\s)(.|\s)(.|\s)\x3C\x01', 'offset': 21},
 )
 
 def scan(file, patch):
@@ -11,10 +11,10 @@ def scan(file, patch):
 	if results is not None:		
 		for result in results:
 			print(result)
-			position = result.start() + patch['offset']
+			position = (result.start() + patch['offset']) - 1
 			file.seek(position)
 			if (file.read(len(patch['original'])) == patch['original']):
-				return result.start() + patch['offset']
+				return position
 	return None
 
 def main():
