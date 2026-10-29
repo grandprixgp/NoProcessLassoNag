@@ -8,5 +8,6 @@ Not necessarily well maintained.
 Tested on the latest version of ProcessLasso as of: 
 
 ~~13/09/2020~~
-
 19/09/2020
+
+no longer maintained: in 2026 @sino87 created https://github.com/sino87/ProcessLasso-NoNag which will hopefully remain maintained
